@@ -1,4 +1,9 @@
-import { restore, popover, visitDashboard } from "e2e/support/helpers";
+import {
+  restore,
+  popover,
+  visitDashboard,
+  rightSidebar,
+} from "e2e/support/helpers";
 // NOTE: some overlap with parameters-embedded.cy.spec.js
 import { SAMPLE_DATABASE } from "e2e/support/cypress_sample_database";
 
@@ -55,6 +60,10 @@ describe("scenarios > dashboard > OLD parameters", () => {
             ],
           });
 
+          cy.intercept("PUT", `/api/card/${dashboard_id}`).as(
+            "updateDashboard",
+          );
+
           visitDashboard(dashboard_id);
         },
       );
@@ -71,6 +80,21 @@ describe("scenarios > dashboard > OLD parameters", () => {
 
       // verify that the filter is applied
       cy.findByText("Doohickey").should("not.exist");
+
+      // Related to metabase#5332 and metabase#29267
+      // Test that modifying dashboard doesn't wipe out parameter values (filters)
+      openDashboardSidebar();
+      cy.findByTestId("dashboard-parameters-widget-container").within(() => {
+        cy.findByText("Gadget").should("be.visible");
+      });
+      rightSidebar().within(() => {
+        cy.findByPlaceholderText("Add description")
+          .click()
+          .type("Please keep filter values 🥹")
+          .blur();
+      });
+      cy.wait("@updateDashboard");
+      cy.findByText("Gadget").should("be.visible");
     });
   });
 
@@ -202,3 +226,9 @@ describe("scenarios > dashboard > OLD parameters", () => {
     });
   });
 });
+
+function openDashboardSidebar() {
+  cy.get("main header").within(() => {
+    cy.icon("info").click();
+  });
+}
