@@ -35,8 +35,7 @@
   Currently it just prints the console out to the console.
   But if you prefer other method of debugging (i.e: tap), you can redef this function
 
-    (alter-var-root #'model-tracking/on-change (fn [path change] (tap> [path change])))
-
+    (alter-var-root #'dev.model-tracking/on-change (fn [_f] (fn [path change] (tap> [path change]))))
 
   - path: is a element vector [model, action]
   - change-info: is a map of the change for a model

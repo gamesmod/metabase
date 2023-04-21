@@ -16,9 +16,6 @@
     :card-update
     :dashboard-create
     :dashboard-update
-    :dashboard-add-cards
-    :dashboard-remove-cards
-    :dashboard-reposition-cards
     :metric-create
     :metric-update
     :metric-delete
